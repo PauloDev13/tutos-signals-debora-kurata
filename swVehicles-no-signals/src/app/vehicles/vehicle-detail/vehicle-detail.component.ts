@@ -1,6 +1,5 @@
-import { Component, inject } from '@angular/core';
+import {Component, computed, inject} from '@angular/core';
 import { AsyncPipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
-import { catchError, EMPTY, map, tap } from 'rxjs';
 import { CartService } from 'src/app/cart/cart.service';
 import { Vehicle } from '../vehicle';
 import { VehicleService } from '../vehicle.service';
@@ -16,25 +15,15 @@ export class VehicleDetailComponent {
   cartService = inject(CartService);
   vehicleService = inject(VehicleService);
 
-    vehicle$ = this.vehicleService.selectedVehicle$.pipe(
-    catchError(err => {
-      this.errorMessage = err;
-      return EMPTY;
-    })
-  );
-
-  pageTitle$ = this.vehicle$.pipe(
-    map(vehicle => vehicle ? `Detail for: ${vehicle.name}` : '')
+  protected vehicle = this.vehicleService.selectedVehicle;
+  protected pageTitle = computed(() => this.vehicle()
+    ? `Detail for: ${this.vehicle()?.name}`
+    : ''
   )
 
-  vehicleFilms$ = this.vehicleService.vehicleFilms$.pipe(
-    catchError(err => {
-      this.errorMessage = err;
-      return EMPTY;
-    })
-  );
+  protected vehicleFilms = this.vehicleService.vehicleFilms;
 
-  addToCart(vehicle: Vehicle) {
-    this.cartService.addToCart(vehicle);
+  addToCart(vehicle: Vehicle | undefined) {
+    this.cartService.addToCart(vehicle as Vehicle);
   }
 }
