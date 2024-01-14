@@ -1,23 +1,25 @@
 <div class="card">
   <div class="card-header">
-    {{pageTitle}}
+    {{ pageTitle }}
   </div>
 
-  @if(vehicles().length) {
+  @if (vehicles().length) {
     <div class='card-body'>
       <div class="list-group">
-        <button type="button"
-                class="list-group-item"
-                *ngFor="let vehicle of vehicles()"
-                [ngClass]="{'active': vehicle?.name === selectedVehicle()?.name}"
-                (click)="onSelected(vehicle.name)">
-          {{ vehicle.name }}
-        </button>
+        @for (vehicle of vehicles(); track vehicle.name) {
+          <button
+            type="button"
+            class="list-group-item"
+            [ngClass]="{'active': vehicle.name === selectedVehicle()?.name}"
+            (click)="onSelected(vehicle.name)">
+            {{ vehicle.name }}
+          </button>
+        }
       </div>
     </div>
   } @else {
     <div class="alert alert-danger">
-      {{errorMessage }}
+      {{ errorMessage }}
     </div>
   }
 </div>

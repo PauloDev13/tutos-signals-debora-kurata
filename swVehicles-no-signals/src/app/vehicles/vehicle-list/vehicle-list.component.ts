@@ -1,11 +1,12 @@
 import {Component, computed, inject} from '@angular/core';
-import { NgFor, NgClass, NgIf, AsyncPipe } from '@angular/common';
-import { VehicleService } from '../vehicle.service';
+import {NgClass, AsyncPipe} from '@angular/common';
+import {VehicleService} from '../vehicle.service';
+import {Vehicle} from "../vehicle";
 
 @Component({
   selector: 'sw-vehicle-list',
   standalone: true,
-  imports: [AsyncPipe, NgClass, NgFor, NgIf],
+  imports: [AsyncPipe, NgClass],
   templateUrl: './vehicle-list.component.html'
 })
 export class VehicleListComponent {
@@ -14,7 +15,7 @@ export class VehicleListComponent {
   vehicleService = inject(VehicleService);
 
   // protected vehicles = this.vehicleService.vehicles;
-  protected vehicles = computed(() => {
+  protected vehicles = computed((): Vehicle[] => {
     try {
       return this.vehicleService.vehicles();
     } catch (e) {
