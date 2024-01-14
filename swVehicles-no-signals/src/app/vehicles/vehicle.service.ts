@@ -10,7 +10,6 @@ import {
   Observable,
   shareReplay,
   switchMap,
-  tap,
   throwError
 } from 'rxjs';
 import { Film, Vehicle, VehicleResponse } from './vehicle';
@@ -21,8 +20,7 @@ import { Film, Vehicle, VehicleResponse } from './vehicle';
 export class VehicleService {
   private url = 'https://swapi.py4e.com/api/vehicles';
   http = inject(HttpClient);
-  
-  // Action stream
+
   private vehicleSelectedSubject = new BehaviorSubject<string>('');
   vehicleSelected$ = this.vehicleSelectedSubject.asObservable();
 
@@ -43,7 +41,7 @@ export class VehicleService {
   );
 
   // Find the vehicle in the list of vehicles
-  selectedVehicle$ = combineLatest([this.vehicles$, 
+  selectedVehicle$ = combineLatest([this.vehicles$,
                                      this.vehicleSelected$]).pipe(
     map(([vehicles, vehicleName]) => vehicles.find((v) => v.name === vehicleName)
     )
