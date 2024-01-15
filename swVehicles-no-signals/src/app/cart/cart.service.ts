@@ -1,5 +1,4 @@
-import { Injectable } from "@angular/core";
-import { combineLatest, map, scan, shareReplay, Subject } from "rxjs";
+import {computed, Injectable, signal} from "@angular/core";
 import { Vehicle } from "../vehicles/vehicle";
 import { Action, CartItem } from "./cart";
 
@@ -7,61 +6,39 @@ import { Action, CartItem } from "./cart";
   providedIn: 'root'
 })
 export class CartService {
+  // Manage start with signals
+  cartItems = signal<CartItem[]>([]);
 
-  // Add item action
-  private itemSubject = new Subject<Action<CartItem>>();
-  itemAction$ = this.itemSubject.asObservable();
-
-  cartItems$ = this.itemAction$
-    .pipe(
-      scan((items, itemAction) =>
-        this.modifyCart(items, itemAction), [] as CartItem[]),
-      shareReplay(1)
-    );
-
-  // Total up the extended price for each item
-  subTotal$ = this.cartItems$.pipe(
-    map(items => items.reduce((a, b) => a + (b.quantity * Number(b.vehicle.cost_in_credits)), 0)),
+  subTotal = computed(() =>
+    this.cartItems().reduce((a, b) =>
+    a + (b.quantity * Number(b.vehicle.cost_in_credits)), 0)
   );
 
-  // Delivery is free if spending more than 100,000 credits
-  deliveryFee$ = this.subTotal$.pipe(
-    map((t) => (t < 100000 ? 999 : 0))
-  );
 
-  // Tax could be based on shipping address zip code
-  tax$ = this.subTotal$.pipe(
-    map((t) => Math.round(t * 10.75) / 100)
-  );
+  deliveryFree = computed(() => this.subTotal() < 100000 ? 999 : 0);
 
-  // Total price
-  totalPrice$ = combineLatest([
-    this.subTotal$,
-    this.deliveryFee$,
-    this.tax$,
-  ]).pipe(map(([st, d, t]) => st + d + t));
+  tax = computed(() => Math.round(this.subTotal() * 10.75) / 100);
+
+  totalPrice = computed(() => this.subTotal() + this.deliveryFree() + this.tax());
 
   // Add the vehicle to the cart as an Action<CartItem>
   addToCart(vehicle: Vehicle): void {
-    this.itemSubject.next({
-      item: { vehicle, quantity: 1 },
-      action: 'add'
-    });
+    this.cartItems.update(items => [...items, { vehicle, quantity: 1 }]);
   }
-
   // Remove the item from the cart
   removeFromCart(cartItem: CartItem): void {
-    this.itemSubject.next({
-      item: { vehicle: cartItem.vehicle, quantity: 0 },
-      action: 'delete'
-    });
+    this.cartItems.update(items =>
+      items.filter(item =>
+        item.vehicle.name !== cartItem.vehicle.name));
   }
 
   updateInCart(cartItem: CartItem, quantity: number) {
-    this.itemSubject.next({
-      item: { vehicle: cartItem.vehicle, quantity },
-      action: 'update'
-    });
+    this.cartItems.update(items =>
+      items.map(item =>
+        item.vehicle.name === cartItem.vehicle.name
+          ? { vehicle: cartItem.vehicle, quantity }
+          : item
+      ));
   }
 
   // Return the updated array of cart items

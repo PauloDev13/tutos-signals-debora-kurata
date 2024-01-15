@@ -1,25 +1,25 @@
-import { Component } from '@angular/core';
-import { AsyncPipe, DecimalPipe, NgIf } from '@angular/common';
+import {Component, inject} from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 
 import { CartService } from '../cart.service';
 
 @Component({
   selector: 'sw-cart-total',
   standalone: true,
-  imports: [AsyncPipe, DecimalPipe, NgIf],
+  imports: [ DecimalPipe ],
   templateUrl: './cart-total.component.html'
 })
 export class CartTotalComponent {
 
-  cartItems$ = this.cartService.cartItems$;
+  private cartService = inject(CartService);
 
-  subTotal$ = this.cartService.subTotal$;
+  cartItems = this.cartService.cartItems;
 
-  deliveryFee$ = this.cartService.deliveryFee$;
+  subTotal = this.cartService.subTotal;
 
-  tax$ = this.cartService.tax$;
+  deliveryFee = this.cartService.deliveryFree;
 
-  totalPrice$ = this.cartService.totalPrice$;
-  
-  constructor(private cartService: CartService) { }
+  tax = this.cartService.tax;
+
+  totalPrice = this.cartService.totalPrice;
 }
