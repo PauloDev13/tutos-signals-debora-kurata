@@ -70,10 +70,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "timeSheet:build:production"
+              "buildTarget": "timeSheet:build:production"
             },
             "development": {
-              "browserTarget": "timeSheet:build:development"
+              "buildTarget": "timeSheet:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -81,7 +81,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "timeSheet:build"
+            "buildTarget": "timeSheet:build"
           }
         },
         "test": {
