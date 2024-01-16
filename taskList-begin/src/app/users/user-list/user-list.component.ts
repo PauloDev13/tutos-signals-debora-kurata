@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../user.service';
 
@@ -17,7 +17,11 @@ export class UserListComponent {
   pageTitle = 'User List';
 
   // Expose the state as signals
+  protected users = this.userService.users
+  protected selectedUserId = this.userService.selectedUserId;
 
   // Set the selected user
-
+  onSelected(id: number) {
+    this.userService.userSelected(id);
+  }
 }
